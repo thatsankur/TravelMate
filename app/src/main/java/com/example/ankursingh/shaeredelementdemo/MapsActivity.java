@@ -4,6 +4,7 @@ package com.example.ankursingh.shaeredelementdemo;
  * Created by Ankur Singh on 09/04/16.
  */
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -21,9 +22,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.ui.IconGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,PlaceSelectionListener,
@@ -33,6 +38,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     int PLACE_PICKER_REQUEST = 1;
     private View pickUpALocationOnMap;
+    PolylineOptions polylineOptions;
+    private ArrayList<LatLng> arrayPoints = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         addSelectLocationOnMapClickView();
         addMapFragment();
         addAutoSearchFragment();
-
-
+        arrayPoints = new ArrayList<>();
     }
 
     private void addSelectLocationOnMapClickView() {
@@ -106,8 +112,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(mMap!=null) {
             LatLng sydney = place.getLatLng();
             String name = place.getName().toString();
-            mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in " + name!=null?name:place.getLatLng().toString()));
+            MarkerOptions lMarkerOptions = new MarkerOptions();
+            lMarkerOptions.position(sydney);
+            lMarkerOptions.title("Marker in " + name != null ? name : place.getLatLng().toString());
+//            lMarkerOptions.icon()
+
+            IconGenerator iconFactory = new IconGenerator(this);
+
+            iconFactory.setColor(Color.BLUE);
+            lMarkerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(arrayPoints.size() + 1 + "")));
+            mMap.addMarker(lMarkerOptions);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
+            polylineOptions = new PolylineOptions();
+            polylineOptions.color(Color.RED);
+            polylineOptions.width(5);
+            arrayPoints.add(sydney);
+            polylineOptions.addAll(arrayPoints);
+            mMap.addPolyline(polylineOptions);
+
+            Log.d(TAG+"URL ",getMapsApiDirectionsUrl(arrayPoints));
         }
     }
 
@@ -119,6 +144,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
                 break;
         }
+    }
+    private String getMapsApiDirectionsUrl(List<LatLng> pLatLngs) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("https://maps.googleapis.com/maps/api/directions/");
+        sb.append("json");
+        sb.append("?");
+        //sb.append("waypoints=optimize:true|");
+        if(pLatLngs!=null && pLatLngs.size()>0){
+            int i = 0,size = pLatLngs.size();
+            boolean addedWayPoint = false;
+            StringBuilder wayPoint = new StringBuilder();
+            for(LatLng l : pLatLngs) {
+                if(l!=null) {
+                    if(i==0){
+                        //origin
+                        sb.append("origin=");
+                        sb.append(l.latitude +
+                                "," +
+                                l.longitude);
+                    }
+                    else if(i==size-1){
+                        //destination
+                        sb.append("&destination=");
+                        sb.append(l.latitude +
+                                "," +
+                                l.longitude);
+                    }
+                    if(!addedWayPoint) {
+                        wayPoint.append("&waypoints=optimize:true|");
+                        addedWayPoint = true;
+                    }
+                    wayPoint.append(l.latitude +
+                            "," +
+                            l.longitude);
+                    if(i<size){
+                        wayPoint.append("|");
+                    }
+                    i++;
+                }
+            }
+            sb.append(wayPoint.toString());
+        }
+
+        sb.append("&sensor=false");
+       /* String waypoints = "waypoints=optimize:true|"
+                + LOWER_MANHATTAN.latitude + "," + LOWER_MANHATTAN.longitude
+                + "|" + "|" + BROOKLYN_BRIDGE.latitude + ","
+                + BROOKLYN_BRIDGE.longitude + "|" + WALL_STREET.latitude + ","
+                + WALL_STREET.longitude;*/
+
+        /*String sensor = "sensor=false";
+        String params = waypoints + "&" + sensor;
+        String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/"
+                + output + "?" + params;*/
+        return sb.toString();
     }
 }
 
