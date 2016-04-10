@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:background="?android:attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="4dp"
+    android:paddingTop="4dp">
+
+    <View
+        android:id="@+id/blue_bar"
+        android:layout_width="12dp"
+        android:layout_height="64dp"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/holo_blue_light"/>
+
+    <View
+        android:id="@+id/orange_bar"
+        android:layout_width="12dp"
+        android:layout_height="64dp"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/holo_orange_light"/>
+</RelativeLayout>

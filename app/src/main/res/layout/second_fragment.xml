@@ -1,0 +1,26 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+
+    android:clickable="true"
+    tools:context=".com.example.ankursingh.shaeredelementdemo.MyActivity$PlaceholderFragment">
+
+    <ImageView
+        android:id="@+id/blue_bar"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_alignParentTop="true"
+        android:transitionName="blue_bar"
+        android:src="@android:drawable/btn_star"/>
+
+    <View
+        android:id="@+id/orange_bar"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_alignParentBottom="true"
+        android:transitionName="orange_bar"
+        android:background="@android:color/holo_orange_light"
+        android:visibility="gone"/>
+
+</RelativeLayout>

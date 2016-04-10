@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Travel Mate</string>
+    <string name="action_settings">Settings</string>
+    <string name="map_api_key">AIzaSyAdaZDrG8H-_nCHyRrGY2CrbcOJQZ5t5l4</string>
+</resources>
