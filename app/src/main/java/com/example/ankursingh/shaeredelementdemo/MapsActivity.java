@@ -132,7 +132,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             polylineOptions.addAll(arrayPoints);
             mMap.addPolyline(polylineOptions);
 
-            Log.d(TAG+"URL ",getMapsApiDirectionsUrl(arrayPoints));
+            Log.d(TAG+"URL ",Util.getInstance().getMapsApiDirectionsUrl(arrayPoints));
         }
     }
 
@@ -145,61 +145,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
-    private String getMapsApiDirectionsUrl(List<LatLng> pLatLngs) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("https://maps.googleapis.com/maps/api/directions/");
-        sb.append("json");
-        sb.append("?");
-        //sb.append("waypoints=optimize:true|");
-        if(pLatLngs!=null && pLatLngs.size()>0){
-            int i = 0,size = pLatLngs.size();
-            boolean addedWayPoint = false;
-            StringBuilder wayPoint = new StringBuilder();
-            for(LatLng l : pLatLngs) {
-                if(l!=null) {
-                    if(i==0){
-                        //origin
-                        sb.append("origin=");
-                        sb.append(l.latitude +
-                                "," +
-                                l.longitude);
-                    }
-                    else if(i==size-1){
-                        //destination
-                        sb.append("&destination=");
-                        sb.append(l.latitude +
-                                "," +
-                                l.longitude);
-                    }
-                    if(!addedWayPoint) {
-                        wayPoint.append("&waypoints=optimize:true|");
-                        addedWayPoint = true;
-                    }
-                    wayPoint.append(l.latitude +
-                            "," +
-                            l.longitude);
-                    if(i<size){
-                        wayPoint.append("|");
-                    }
-                    i++;
-                }
-            }
-            sb.append(wayPoint.toString());
-        }
 
-        sb.append("&sensor=false");
-       /* String waypoints = "waypoints=optimize:true|"
-                + LOWER_MANHATTAN.latitude + "," + LOWER_MANHATTAN.longitude
-                + "|" + "|" + BROOKLYN_BRIDGE.latitude + ","
-                + BROOKLYN_BRIDGE.longitude + "|" + WALL_STREET.latitude + ","
-                + WALL_STREET.longitude;*/
-
-        /*String sensor = "sensor=false";
-        String params = waypoints + "&" + sensor;
-        String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions/"
-                + output + "?" + params;*/
-        return sb.toString();
-    }
 }
 
