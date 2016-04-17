@@ -4,10 +4,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -20,25 +24,51 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 /**
  * Created by Ankur Singh on 17/04/16.
  */
-public class LandingActivity extends AppBaseActivity implements View.OnClickListener,LoaderManager.LoaderCallbacks<Cursor> {
+public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
+        LoaderManager.LoaderCallbacks<Cursor>,MyTripListCursorAdapter.MyTripListCursorAdapterCallbacks {
     private final String TAG = LogUtils.getClassName();
     private EditText mTravelPlanNameEditText;
     private FloatingActionButton addFav;
+    private RecyclerView mMytripRecyclerView;
+    private MyTripListCursorAdapter myTripListCursorAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.landing_activity);
         mTravelPlanNameEditText = (EditText) findViewById(R.id.et_travel_plan_name);
+        mTravelPlanNameEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (mTravelPlanNameEditText.getRight() -
+                            mTravelPlanNameEditText.getCompoundDrawables()[DRAWABLE_RIGHT].
+                                    getBounds().width())) {
+                        insertNewImageUriInDb(mTravelPlanNameEditText.getText().toString());
+                        mTravelPlanNameEditText.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         addFav = (FloatingActionButton) findViewById(R.id.fab_add_plan);
         addFav.setOnClickListener(this);
+        mMytripRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        mMytripRecyclerView.setHasFixedSize(true);
 
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fab_add_plan:
-                insertNewImageUriInDb(mTravelPlanNameEditText.getText().toString());
+                //insertNewImageUriInDb(mTravelPlanNameEditText.getText().toString());
                 break;
         }
     }
@@ -47,7 +77,7 @@ public class LandingActivity extends AppBaseActivity implements View.OnClickList
     private void insertNewImageUriInDb(String pPlanName) {
         ContentValues cv = new ContentValues();
         cv.put(TravelMateContract.TravelPlan.PLAN_NAME, pPlanName);
-        LogUtils.info(TAG,getApplicationContext().getContentResolver().insert(AppContentProvider.TRAVEL_PLAN_TABLE_URI, cv).toString());
+        LogUtils.info(TAG, getApplicationContext().getContentResolver().insert(AppContentProvider.TRAVEL_PLAN_TABLE_URI, cv).toString());
     }
 
     @Override
@@ -72,11 +102,27 @@ public class LandingActivity extends AppBaseActivity implements View.OnClickList
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        if(myTripListCursorAdapter== null) {
+            myTripListCursorAdapter = new MyTripListCursorAdapter(this, data,this);
+            mMytripRecyclerView.setAdapter(myTripListCursorAdapter);
+            mMytripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }else {
+            myTripListCursorAdapter.swapCursor(data);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        if(myTripListCursorAdapter!=null){
+            myTripListCursorAdapter.swapCursor(null);
+        }
+    }
 
+    @Override
+    public void onDelete(int pRowID) {
+        LogUtils.info(TAG, "Deleted >> "+getApplicationContext().getContentResolver().
+                delete(AppContentProvider.TRAVEL_PLAN_TABLE_URI.buildUpon().appendPath(String.valueOf(pRowID)).build(),
+                         null,
+                        null)+"");
     }
 }

@@ -13,9 +13,13 @@
             android:id="@+id/et_travel_plan_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableEnd="@android:drawable/ic_input_add"
+            android:drawableRight="@android:drawable/ic_input_add"
             android:hint="@string/travel_plan_name" />
 
+
     </android.support.design.widget.TextInputLayout>
+
     <RelativeLayout
         android:id="@+id/rl_nearby_section_details"
         android:layout_width="wrap_content"

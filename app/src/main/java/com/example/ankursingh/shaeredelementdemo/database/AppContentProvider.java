@@ -129,8 +129,13 @@ public class AppContentProvider extends ContentProvider {
                 String id = uri.getPathSegments().get(1);
                 count = db.delete(TravelMateContract.TravelPlan.TABLE_NAME, TravelMateContract.TravelPlan._ID +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+
                 break;
 
+        }
+        if (count > 0)
+        {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
         return count;
     }
