@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/iv_close_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:layout_alignParentRight="true" android:layout_margin="10dp"/>
+    <TextView
+        android:id="@+id/nearby_location_title"
+        android:layout_width="wrap_content"
+        android:text="Nearby location to visit!"
+        android:layout_alignBaseline="@+id/iv_close_button"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="89dp"
+        android:layout_marginStart="89dp"
+        android:layout_alignBottom="@+id/iv_close_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <include layout="@layout/place_detail"
+        android:layout_width="match_parent"
+        android:id="@+id/place_detail_root"
+        android:layout_below="@+id/iv_close_button"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

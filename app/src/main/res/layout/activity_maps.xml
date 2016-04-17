@@ -33,4 +33,10 @@
         android:id="@+id/map"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
+    <RelativeLayout
+        android:id="@+id/rl_place_detail_fragment"
+        android:layout_below="@id/rl_place_search_holder"
+        android:layout_marginTop="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

@@ -3,16 +3,27 @@ package com.example.ankursingh.shaeredelementdemo;
 /**
  * Created by Ankur Singh on 09/04/16.
  */
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.crashlytics.android.Crashlytics;
+import com.example.ankursingh.shaeredelementdemo.travelmate.model.Node;
+import com.example.ankursingh.shaeredelementdemo.travelmate.model.NodeFragment;
+import com.example.ankursingh.shaeredelementdemo.travelmate.model.PlaceImpl;
+import com.example.ankursingh.shaeredelementdemo.util.AppConstants;
+import com.example.ankursingh.shaeredelementdemo.util.AppUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -24,30 +35,35 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,PlaceSelectionListener,
-        View.OnClickListener{
-    public String TAG = "MapsActivity";
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener,
+        View.OnClickListener, GoogleMap.OnInfoWindowClickListener,NodeFragment.NodeFragmentCallbacks {
+    private String TAG = "MapsActivity";
     private GoogleMap mMap;
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-    int PLACE_PICKER_REQUEST = 1;
+
     private View pickUpALocationOnMap;
-    PolylineOptions polylineOptions;
+    private PolylineOptions polylineOptions;
     private ArrayList<LatLng> arrayPoints = null;
+    private final String PLACE_FRAGMENT_KEY = "PLACE_FRAGMENT_KEY";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_maps);
         addSelectLocationOnMapClickView();
         addMapFragment();
         addAutoSearchFragment();
         arrayPoints = new ArrayList<>();
+        map = new HashMap<>();
     }
 
     private void addSelectLocationOnMapClickView() {
@@ -55,17 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pickUpALocationOnMap.setOnClickListener(this);
     }
 
-    private void launchPlacePicker() {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
-        try {
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void addMapFragment() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -78,10 +84,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(this);
     }
-
+    private final int PERMISSION_REQUEST_CODE = 1;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_REQUEST_CODE);
+        }else {
+            mMap.setMyLocationEnabled(true);
+        }
+        mMap.setOnInfoWindowClickListener(this);
     }
 
     @Override
@@ -97,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PLACE_PICKER_REQUEST) {
+        if (requestCode == AppConstants.PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 String toastMsg = String.format("Place: %s", place.getName());
@@ -110,16 +130,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addPlaceOnMap(Place place) {
         if(mMap!=null) {
+
             LatLng sydney = place.getLatLng();
+            map.put(sydney,place);
             String name = place.getName().toString();
             MarkerOptions lMarkerOptions = new MarkerOptions();
             lMarkerOptions.position(sydney);
             lMarkerOptions.title("Marker in " + name != null ? name : place.getLatLng().toString());
-//            lMarkerOptions.icon()
 
             IconGenerator iconFactory = new IconGenerator(this);
 
-            iconFactory.setColor(Color.BLUE);
+            iconFactory.setColor(Color.parseColor("#2dFFDF"));
             lMarkerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(arrayPoints.size() + 1 + "")));
             mMap.addMarker(lMarkerOptions);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
@@ -140,11 +161,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_select_location_on_map:{
-                launchPlacePicker();
+                AppUtils.getInstance().launchPlacePicker(this, AppConstants.PLACE_PICKER_REQUEST);
             }
                 break;
         }
     }
 
+    private HashMap<LatLng,Place> map ;
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Place p = map.get(marker.getPosition());
+        addPlaceDetailFragment(p);
+
+    }
+
+    private void addPlaceDetailFragment(Place p) {
+        Node n = new Node();
+        PlaceImpl mp = PlaceImpl.getMyPlace(p);
+        n.setPlace(mp);
+
+        NodeFragment nf = NodeFragment.getInstance(n);
+        FragmentManager fm = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+        ft.add(R.id.rl_place_detail_fragment, nf, PLACE_FRAGMENT_KEY);
+        ft.addToBackStack(PLACE_FRAGMENT_KEY);
+        ft.commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case PERMISSION_REQUEST_CODE:
+                int i=0;
+                for(String s : permissions){
+                    if(Manifest.permission.ACCESS_COARSE_LOCATION.equals(s)){
+                        if(grantResults[i] == PackageManager.PERMISSION_GRANTED){
+                            if(! (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                                    ActivityCompat.checkSelfPermission(this,
+                                            Manifest.permission.ACCESS_FINE_LOCATION) !=
+                                            PackageManager.PERMISSION_GRANTED &&
+                                    ActivityCompat.checkSelfPermission(this,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                                            PackageManager.PERMISSION_GRANTED))
+                            mMap.setMyLocationEnabled(true);
+                        }
+                    }
+                    i++;
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onClose() {
+        Fragment f = getSupportFragmentManager().findFragmentByTag(PLACE_FRAGMENT_KEY);
+        getSupportFragmentManager().beginTransaction().remove(f).commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onPlaceAdded(Place pPlace) {
+
+    }
+
+    @Override
+    public void onPlaceRemoved(Place pPlace) {
+
+    }
+
+    @Override
+    public void onNextHopAdded(Place pPlace) {
+
+    }
+
+    @Override
+    public void onNextHopRemoved(Place pPlace) {
+
+    }
 }
 
