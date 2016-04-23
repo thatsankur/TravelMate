@@ -12,11 +12,6 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.example.ankursingh.shaeredelementdemo.R;
-import com.example.ankursingh.shaeredelementdemo.util.AppUtils;
-
-import java.util.HashMap;
-
 /**
  * Created by Ankur Singh on 16/04/16.
  */
@@ -27,18 +22,18 @@ public class AppContentProvider extends ContentProvider {
 
     public static final String AUTHORITY_STRING = "content://" + PROVIDER_NAME;
     public static final Uri TRAVEL_PLAN_TABLE_URI = Uri.parse(AUTHORITY_STRING+ "/"+TravelMateContract.TravelPlan.TABLE_NAME);
-    public static final Uri PLACE_TABLE_URI = Uri.parse(AUTHORITY_STRING+ "/"+TravelMateContract.Place.TABLE_NAME);
+    public static final Uri NODE_TABLE_URI = Uri.parse(AUTHORITY_STRING+ "/"+ TravelMateContract.Node.TABLE_NAME);
     static final int TRAVEL_PLAN = 1;
     static final int TRAVEL_PLAN_ID = 2;
-    static final int PLACE = 3;
-    static final int PLACE_ID = 4;
+    static final int NODE = 3;
+    static final int NODE_ID = 4;
     static final UriMatcher uriMatcher;
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.TravelPlan.TABLE_NAME, TRAVEL_PLAN);
         uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.TravelPlan.TABLE_NAME +"/#", TRAVEL_PLAN_ID);
-        uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.Place.TABLE_NAME, PLACE);
-        uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.Place.TABLE_NAME +"/#", PLACE_ID);
+        uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.Node.TABLE_NAME, NODE);
+        uriMatcher.addURI(PROVIDER_NAME, TravelMateContract.Node.TABLE_NAME +"/#", NODE_ID);
     }
     private SQLiteDatabase db;
     @Override
@@ -67,12 +62,12 @@ public class AppContentProvider extends ContentProvider {
                 qb.setTables(TravelMateContract.TravelPlan.TABLE_NAME);
                 qb.appendWhere( TravelMateContract.TravelPlan._ID + "=" + uri.getPathSegments().get(1));
                 break;
-            case PLACE:
-                qb.setTables(TravelMateContract.Place.TABLE_NAME);
+            case NODE:
+                qb.setTables(TravelMateContract.Node.TABLE_NAME);
                 break;
-            case PLACE_ID:
-                qb.setTables(TravelMateContract.Place.TABLE_NAME);
-                qb.appendWhere( TravelMateContract.Place._ID + "=" + uri.getPathSegments().get(1));
+            case NODE_ID:
+                qb.setTables(TravelMateContract.Node.TABLE_NAME);
+                qb.appendWhere( TravelMateContract.Node._ID + "=" + uri.getPathSegments().get(1));
                 break;
         }
         Cursor c = qb.query(db,	projection,	selection, selectionArgs,null, null, sortOrder);
@@ -98,22 +93,16 @@ public class AppContentProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case TRAVEL_PLAN:
                 rowID= db.insert(	TravelMateContract.TravelPlan.TABLE_NAME, "", values);
-                if (rowID > 0)
-                {
-                    _uri = ContentUris.withAppendedId(TRAVEL_PLAN_TABLE_URI, rowID);
-                    getContext().getContentResolver().notifyChange(_uri, null);
-                    return _uri;
-                }
                 break;
-            case PLACE:
-                rowID= db.insert(	TravelMateContract.Place.TABLE_NAME, "", values);
-                if (rowID > 0)
-                {
-                    _uri = ContentUris.withAppendedId(PLACE_TABLE_URI, rowID);
-                    getContext().getContentResolver().notifyChange(_uri, null);
-                    return _uri;
-                }
+            case NODE:
+                rowID= db.insert(	TravelMateContract.Node.TABLE_NAME, "", values);
                 break;
+        }
+        if (rowID > 0)
+        {
+            _uri = ContentUris.withAppendedId(uri, rowID);
+            getContext().getContentResolver().notifyChange(_uri, null);
+            return _uri;
         }
         return _uri;
     }
@@ -121,15 +110,23 @@ public class AppContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
+        String id = null;
         switch (uriMatcher.match(uri)) {
             case TRAVEL_PLAN:
                 count = db.delete(TravelMateContract.TravelPlan.TABLE_NAME, selection, selectionArgs);
                 break;
             case TRAVEL_PLAN_ID:
-                String id = uri.getPathSegments().get(1);
+                 id = uri.getPathSegments().get(1);
                 count = db.delete(TravelMateContract.TravelPlan.TABLE_NAME, TravelMateContract.TravelPlan._ID +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
-
+                break;
+            case NODE:
+                count = db.delete(TravelMateContract.Node.TABLE_NAME, selection, selectionArgs);
+                break;
+            case NODE_ID:
+                id = uri.getPathSegments().get(1);
+                count = db.delete(TravelMateContract.Node.TABLE_NAME, TravelMateContract.TravelPlan._ID +  " = " + id +
+                        (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
 
         }
@@ -142,10 +139,25 @@ public class AppContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        int rows = 0;
         switch (uriMatcher.match(uri)) {
             case TRAVEL_PLAN:
+                rows = db.update(TravelMateContract.TravelPlan.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case TRAVEL_PLAN_ID:
+                rows = db.update(TravelMateContract.TravelPlan.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case NODE:
+                rows = db.update(TravelMateContract.Node.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case NODE_ID:
+                rows = db.update(TravelMateContract.Node.TABLE_NAME,values,selection,selectionArgs);
                 break;
         }
-        return 0;
+        if (rows > 0)
+        {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rows;
     }
 }

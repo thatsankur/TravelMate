@@ -28,10 +28,12 @@ public class MyTripListCursorAdapter extends CursorRecyclerViewAdapter<MyTripLis
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
         public ImageView deleteView;
+        public View root;
         public ViewHolder(View view) {
             super(view);
             mTextView = (TextView)view.findViewById(R.id.tv_trip_name);
             deleteView = (ImageView) view.findViewById(R.id.iv_delete_trip);
+            root = view.findViewById(R.id.rl_travel_plant_root_element);
         }
     }
 
@@ -45,17 +47,26 @@ public class MyTripListCursorAdapter extends CursorRecyclerViewAdapter<MyTripLis
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final Cursor cursor) {
-        MyTripListItem myListItem = MyTripListItem.fromCursor(cursor);
+        final MyTripListItem myListItem = MyTripListItem.fromCursor(cursor);
         viewHolder.mTextView.setText(myListItem.getName());
-        viewHolder.deleteView.setOnClickListener(new View.OnClickListener() {
-            private final int ID = cursor.getInt(0) ;
+        viewHolder.root.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if(mCallback!=null){
-                    LogUtils.info("Del ",ID+" ");
+                if (mCallback != null) {
+                    LogUtils.info("Del ", myListItem.getId() + " ");
+                    mCallback.onRowItemClicked(myListItem);
+                }
+            }
+        });
+        viewHolder.deleteView.setOnClickListener(new View.OnClickListener() {
+            private final int ID = cursor.getInt(0);
+
+            @Override
+            public void onClick(View v) {
+                if (mCallback != null) {
+                    LogUtils.info("Del ", ID + " ");
                     mCallback.onDelete(ID);
-                    notifyDataSetChanged();
                 }
             }
         });
@@ -63,5 +74,6 @@ public class MyTripListCursorAdapter extends CursorRecyclerViewAdapter<MyTripLis
 
     public  interface MyTripListCursorAdapterCallbacks{
         void onDelete(int pRowID);
+        void onRowItemClicked(MyTripListItem pMyTripListItem);
     }
 }

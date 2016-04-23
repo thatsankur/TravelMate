@@ -27,14 +27,14 @@ public class NodeFragment extends Fragment implements View.OnClickListener {
     public static NodeFragment getInstance(Node pNode){
         NodeFragment nf = new NodeFragment();
         Bundle b = new Bundle();
-        b.putString("node", GsonUtils.getInstance().serializeToJson(pNode));
+        b.putParcelable("node", pNode);
         nf.setArguments(b);
         return nf;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNode = GsonUtils.getInstance().deserializeJSON(getArguments().getString("node"),Node.class);
+        mNode = getArguments().getParcelable("node");
         if(getActivity() instanceof NodeFragmentCallbacks){
             mCallbacks = (NodeFragmentCallbacks) getActivity();
         }
@@ -90,7 +90,7 @@ public class NodeFragment extends Fragment implements View.OnClickListener {
         if (requestCode == AppConstants.PLACE_PICKER_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this.getActivity());
-                String toastMsg = String.format("Place: %s", place.getName());
+                String toastMsg = String.format("Node: %s", place.getName());
                 Toast.makeText(this.getContext(), toastMsg, Toast.LENGTH_LONG).show();
                 //addPlaceOnMap(place);
             }

@@ -1,6 +1,7 @@
 package com.example.ankursingh.shaeredelementdemo.landing;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -15,16 +16,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
+import com.example.ankursingh.shaeredelementdemo.MapsActivity;
 import com.example.ankursingh.shaeredelementdemo.R;
 import com.example.ankursingh.shaeredelementdemo.base.AppBaseActivity;
 import com.example.ankursingh.shaeredelementdemo.database.AppContentProvider;
 import com.example.ankursingh.shaeredelementdemo.database.TravelMateContract;
+import com.example.ankursingh.shaeredelementdemo.util.AppConstants;
 import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 
 /**
  * Created by Ankur Singh on 17/04/16.
  */
-public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
+                public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor>,MyTripListCursorAdapter.MyTripListCursorAdapterCallbacks {
     private final String TAG = LogUtils.getClassName();
     private EditText mTravelPlanNameEditText;
@@ -124,5 +127,14 @@ public class LandingActivity extends AppBaseActivity implements View.OnClickList
                 delete(AppContentProvider.TRAVEL_PLAN_TABLE_URI.buildUpon().appendPath(String.valueOf(pRowID)).build(),
                          null,
                         null)+"");
+    }
+
+    @Override
+    public void onRowItemClicked(MyTripListItem pMyTripListItem) {
+        Intent intent = new Intent(LandingActivity.this, MapsActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable(AppConstants.TRAVEL_PLAN_KEY,pMyTripListItem);
+        intent.putExtras(b);
+        startActivity(intent);
     }
 }

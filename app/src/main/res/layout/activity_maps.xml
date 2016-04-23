@@ -2,40 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/rl_place_search_holder"
-        android:background="@color/colorAccent">
-        <fragment
-            android:id="@+id/place_autocomplete_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-            />
-        <TextView
-            android:id="@+id/tv_select_location_on_map"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:padding="15dp"
-            android:gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/place_autocomplete_fragment"
-            android:text="Pick Up In the Map"/>
-    </RelativeLayout>
+
 
     <fragment
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/rl_place_search_holder"
         android:id="@+id/map"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
     <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:id="@+id/rl_place_search_holder"
+        android:background="@android:color/white">
+        <TextView
+            android:id="@+id/tv_select_location_on_map_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentRight="true"
+            android:text="You have not selected the place where the journey begins!"/>
+      <!--  <fragment
+            android:id="@+id/place_autocomplete_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/tv_select_location_on_map_message"
+            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+            />-->
+        <TextView
+            android:id="@+id/tv_select_location_on_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_below="@id/tv_select_location_on_map_message"
+            android:text="Pick Up a place In the Map"/>
+    </RelativeLayout>
+    <RelativeLayout
         android:id="@+id/rl_place_detail_fragment"
-        android:layout_below="@id/rl_place_search_holder"
+
         android:layout_marginTop="150dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
