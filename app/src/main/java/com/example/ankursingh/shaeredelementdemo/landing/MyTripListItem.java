@@ -9,7 +9,7 @@ import android.os.Parcelable;
  */
 public class MyTripListItem implements Parcelable {
     private String name;
-    private int _id;
+    private int _id = -1;
     private int place_id = -1;
 
     public int getId() {

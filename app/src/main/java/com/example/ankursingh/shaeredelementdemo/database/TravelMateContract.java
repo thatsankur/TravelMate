@@ -20,7 +20,8 @@ public class TravelMateContract {
                 "CREATE TABLE " + TravelMateContract.TravelPlan.TABLE_NAME + " (" +
                         TravelMateContract.TravelPlan._ID + " INTEGER PRIMARY KEY," +
                         TravelMateContract.TravelPlan.PLAN_NAME + TEXT_TYPE + COMMA_SEP +
-                        TravelMateContract.TravelPlan._PLACE_ID + INTEGER_TYPE + " DEFAULT -1 "+ COMMA_SEP +
+                        TravelMateContract.TravelPlan._PLACE_ID + INTEGER_TYPE +
+                        " DEFAULT -1 REFERENCES "+ Node.TABLE_NAME +" ON DELETE CASCADE"+ COMMA_SEP +//Added FK constraint
                         TravelMateContract.TravelPlan.PLAN_DESCRIPTION + TEXT_TYPE +
                         " )";
         public static final String SQL_DELETE_TRAVEL_PLAN =

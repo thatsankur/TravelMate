@@ -1,12 +1,12 @@
 package com.example.ankursingh.shaeredelementdemo.base;
 
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 
 import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 
 /**
- * Created by Ankur Singh on 17/04/16.
+ * Created by Ankur Singh on 23/04/16.
  */
-public class AppBaseActivity extends AppCompatActivity {
+public class BaseFragment extends Fragment {
     public final String TAG = LogUtils.getClassName();
 }

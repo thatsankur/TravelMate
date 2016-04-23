@@ -46,7 +46,7 @@ public final class PlaceImpl implements Serializable, Parcelable,Place {
     public PlaceImpl(String id, List<Integer> placeTypes,
                      String address, Locale locale,
                      String name, LatLng latLng,
-                     LatLngBounds viewport, String websiteUri,
+                     LatLngBounds viewport, Uri websiteUri,
                      String phoneNumber, float rating,
                      int priceLevel, String attributions) {
         this.id = id;
@@ -56,7 +56,7 @@ public final class PlaceImpl implements Serializable, Parcelable,Place {
         this.name = name;
         this.latLng = latLng;
         this.viewport = viewport;
-        this.websiteUri = websiteUri;
+        this.websiteUri = websiteUri!=null?websiteUri.toString():null;
         this.phoneNumber = phoneNumber;
         this.rating = rating;
         this.priceLevel = priceLevel;
@@ -92,7 +92,7 @@ public final class PlaceImpl implements Serializable, Parcelable,Place {
     }
 
     public Uri getWebsiteUri() {
-        return Uri.parse(websiteUri);
+        return websiteUri!=null?Uri.parse(websiteUri):null;
     }
 
     public String getPhoneNumber() {
@@ -115,7 +115,7 @@ public final class PlaceImpl implements Serializable, Parcelable,Place {
         return new PlaceImpl(pPlace.getId(),pPlace.getPlaceTypes(),
                 pPlace.getAddress()+"",pPlace.getLocale(),
                 pPlace.getName()+"",pPlace.getLatLng(),pPlace.getViewport(),
-                pPlace.getWebsiteUri().toString(),pPlace.getPhoneNumber()+"",
+                pPlace.getWebsiteUri(),pPlace.getPhoneNumber()+"",
                 pPlace.getRating(),pPlace.getPriceLevel(),pPlace.getAttributions()+"");
     }
 

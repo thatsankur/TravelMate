@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="@android:color/white">
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_edit_itinerary_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:layout_margin="10dp"
+            android:id="@+id/et_travel_plan_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@android:drawable/ic_input_add"
+            android:drawableRight="@android:drawable/ic_input_add"
+            android:hint="@string/travel_plan_name" />
+    </android.support.design.widget.TextInputLayout>
+</RelativeLayout>

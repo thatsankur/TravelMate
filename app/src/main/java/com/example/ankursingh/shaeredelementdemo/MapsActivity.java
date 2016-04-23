@@ -25,9 +25,10 @@ import com.crashlytics.android.Crashlytics;
 import com.example.ankursingh.shaeredelementdemo.base.BaseHandler;
 import com.example.ankursingh.shaeredelementdemo.database.AppContentProvider;
 import com.example.ankursingh.shaeredelementdemo.database.TravelMateContract;
+import com.example.ankursingh.shaeredelementdemo.landing.EditItenaryDetailFragment;
 import com.example.ankursingh.shaeredelementdemo.landing.MyTripListItem;
 import com.example.ankursingh.shaeredelementdemo.travelmate.model.Node;
-import com.example.ankursingh.shaeredelementdemo.travelmate.model.NodeFragment;
+import com.example.ankursingh.shaeredelementdemo.landing.NodeFragment;
 import com.example.ankursingh.shaeredelementdemo.travelmate.model.PlaceImpl;
 import com.example.ankursingh.shaeredelementdemo.util.AppConstants;
 import com.example.ankursingh.shaeredelementdemo.util.AppUtils;
@@ -35,7 +36,6 @@ import com.example.ankursingh.shaeredelementdemo.util.GsonUtils;
 import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -158,8 +158,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Node n = new Node();
                 PlaceImpl mp = PlaceImpl.getMyPlace(place);
                 n.setPlace(mp);
+//                n.setParentNodeID();
+                mPickupaPlace.setVisibility(View.GONE);
+                String name = place.getName().toString();
                 int id = savePlaceInDBAndGetID(n);
-                updateItenaryInDBWithPlaceID(id);
+                updateItenaryInDBWithPlaceID("Starting from "+name != null ? name : place.getLatLng().toString(),id);
                 addPlaceOnMap(PlaceImpl.getMyPlace(place));
             }
         }
@@ -231,14 +234,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void updateItenaryInDBWithPlaceID(int id) {
+    private void updateItenaryInDBWithPlaceID(String placeName,int id) {
         ContentValues newCV = new ContentValues();
         //newCV.put(TravelMateContract.TravelPlan._ID, myTripListItem.getId());
         newCV.put(TravelMateContract.TravelPlan.PLAN_NAME, myTripListItem.getName());
         newCV.put(TravelMateContract.TravelPlan._PLACE_ID, id);
-        LogUtils.info(TAG, getApplicationContext().getContentResolver().
-                update(AppContentProvider.TRAVEL_PLAN_TABLE_URI, newCV,
-                        TravelMateContract.TravelPlan._ID + " = ?",new String[]{myTripListItem.getId()+""}) +"");
+
+        myTripListItem.setPlaceId(id);
+        myTripListItem.setName(placeName);
+        EditItenaryDetailFragment.getInstance(myTripListItem).show(getSupportFragmentManager(), "");
     }
 
     private int savePlaceInDBAndGetID(Node n) {
@@ -248,6 +252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return Integer.parseInt(
                 getContentResolver().insert(AppContentProvider.NODE_TABLE_URI,cv).
                         getPathSegments().get(1));
+
     }
 
     @Override

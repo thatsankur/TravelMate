@@ -39,6 +39,13 @@ public class Node implements Serializable, Parcelable {
     public void setNote(Note mNote) {
         this.mNote = mNote;
     }
+    public int getParentNodeID() {
+        return id;
+    }
+
+    public void setParentNodeID(int id) {
+        this.id = id;
+    }
 
     @Override
     public int describeContents() {

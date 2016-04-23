@@ -1,4 +1,4 @@
-package com.example.ankursingh.shaeredelementdemo.travelmate.model;
+package com.example.ankursingh.shaeredelementdemo.landing;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,16 +11,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ankursingh.shaeredelementdemo.R;
+import com.example.ankursingh.shaeredelementdemo.base.BaseFragment;
+import com.example.ankursingh.shaeredelementdemo.travelmate.model.Node;
 import com.example.ankursingh.shaeredelementdemo.util.AppConstants;
 import com.example.ankursingh.shaeredelementdemo.util.AppUtils;
-import com.example.ankursingh.shaeredelementdemo.util.GsonUtils;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 /**
  * Created by Ankur Singh on 14/04/16.
  */
-public class NodeFragment extends Fragment implements View.OnClickListener {
+public class NodeFragment extends BaseFragment implements View.OnClickListener {
     private Node mNode;
     private NodeFragmentCallbacks mCallbacks;
     private View closeButton,addNearbyPlaces,addNextHop;

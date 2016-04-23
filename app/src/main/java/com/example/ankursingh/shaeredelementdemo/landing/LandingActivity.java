@@ -30,7 +30,7 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
                 public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor>,MyTripListCursorAdapter.MyTripListCursorAdapterCallbacks {
     private final String TAG = LogUtils.getClassName();
-    private EditText mTravelPlanNameEditText;
+
     private FloatingActionButton addFav;
     private RecyclerView mMytripRecyclerView;
     private MyTripListCursorAdapter myTripListCursorAdapter;
@@ -38,27 +38,7 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.landing_activity);
-        mTravelPlanNameEditText = (EditText) findViewById(R.id.et_travel_plan_name);
-        mTravelPlanNameEditText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
 
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (mTravelPlanNameEditText.getRight() -
-                            mTravelPlanNameEditText.getCompoundDrawables()[DRAWABLE_RIGHT].
-                                    getBounds().width())) {
-                        insertNewImageUriInDb(mTravelPlanNameEditText.getText().toString());
-                        mTravelPlanNameEditText.setText("");
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
         addFav = (FloatingActionButton) findViewById(R.id.fab_add_plan);
         addFav.setOnClickListener(this);
         mMytripRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
@@ -71,17 +51,15 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fab_add_plan:
-                //insertNewImageUriInDb(mTravelPlanNameEditText.getText().toString());
+                MyTripListItem l = new MyTripListItem();
+                l.setName("New Trip");
+                launchMyTripMap(l);
                 break;
         }
     }
 
 
-    private void insertNewImageUriInDb(String pPlanName) {
-        ContentValues cv = new ContentValues();
-        cv.put(TravelMateContract.TravelPlan.PLAN_NAME, pPlanName);
-        LogUtils.info(TAG, getApplicationContext().getContentResolver().insert(AppContentProvider.TRAVEL_PLAN_TABLE_URI, cv).toString());
-    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -131,6 +109,10 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 
     @Override
     public void onRowItemClicked(MyTripListItem pMyTripListItem) {
+        launchMyTripMap(pMyTripListItem);
+    }
+
+    private void launchMyTripMap(MyTripListItem pMyTripListItem) {
         Intent intent = new Intent(LandingActivity.this, MapsActivity.class);
         Bundle b = new Bundle();
         b.putParcelable(AppConstants.TRAVEL_PLAN_KEY,pMyTripListItem);
