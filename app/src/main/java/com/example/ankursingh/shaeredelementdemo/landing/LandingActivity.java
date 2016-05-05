@@ -27,7 +27,7 @@ import com.example.ankursingh.shaeredelementdemo.util.LogUtils;
 /**
  * Created by Ankur Singh on 17/04/16.
  */
-                public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
+public class LandingActivity extends AppBaseActivity implements View.OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor>,MyTripListCursorAdapter.MyTripListCursorAdapterCallbacks {
     private final String TAG = LogUtils.getClassName();
 

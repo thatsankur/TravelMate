@@ -81,4 +81,10 @@ public class Util {
                 + output + "?" + params;*/
         return sb.toString();
     }
+    /**
+     * spatial rep of nearby items
+     *
+     *          * -> *
+     *
+     */
 }
