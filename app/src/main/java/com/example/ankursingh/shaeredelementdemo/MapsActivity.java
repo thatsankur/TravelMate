@@ -65,6 +65,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MyTripListItem myTripListItem;
     private View mPickupaPlace;
     private BaseHandler mHandler;
+    /**
+     * Reference of node which is currently selected by user
+     *   1) add Next hop and
+     *   2) add nearby place to visit will work on this reference
+     */
+    private Node mCurrentNode;
+    /**
+     * Reference of node that indicate starting point of journey
+     */
+    private Node mHeadNode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -282,8 +292,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onClose() {
-        Fragment f = getSupportFragmentManager().findFragmentByTag(PLACE_FRAGMENT_KEY);
-        getSupportFragmentManager().beginTransaction().remove(f).commitAllowingStateLoss();
+        /*Fragment f = getSupportFragmentManager().findFragmentByTag(PLACE_FRAGMENT_KEY);
+        getSupportFragmentManager().beginTransaction().remove(f).commitAllowingStateLoss();*/
+        onBackPressed();
     }
 
     @Override
